@@ -1,10 +1,7 @@
 unit About;
-
 interface
-
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
   Buttons, ExtCtrls;
-
 type
   TAboutBox = class(TForm)
     Panel1: TPanel;
@@ -24,29 +21,22 @@ type
   public
     { Public declarations }
   end;
-
 var
   AboutBox: TAboutBox;
-
 implementation
-
 {$R *.DFM}
-
 procedure TAboutBox.OKButtonClick(Sender: TObject);
 begin
   Close;
 end;
-
 procedure TAboutBox.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   ModalResult := mrOk;
 end;
-
 procedure TAboutBox.FormCreate(Sender: TObject);
 begin
   //Height := 294;
   //Width := 375;
 end;
-
 end.
  

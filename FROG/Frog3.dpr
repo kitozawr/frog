@@ -1,5 +1,4 @@
 program Frog3;
-
 uses
   Forms,
   About in 'About.pas' {AboutBox},
@@ -75,14 +74,18 @@ uses
   RTTheory in 'RTTheory.pas',
   RTExperiment in 'RTExperiment.pas',
   RunTypeFactory in 'RunTypeFactory.pas',
-  ErrorGraph in 'ErrorGraph.pas' {frmErrorGraph};
+  ErrorGraph in 'ErrorGraph.pas' {frmErrorGraph},
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.RES}
-
 begin
   Application.Initialize;
-  Application.Title := 'Frog3.exe';
+  TStyleManager.TrySetStyle('Windows10');
+  Application.Title := 'Frog4.exe';
   Application.HelpFile := 'C:\workspace\FROG\FROG.chm';
+  Application.CreateForm(TfrmMainForm, frmMainForm);
+  Application.CreateForm(TfrmTADCals, frmTADCals);
   Application.CreateForm(TfrmMainForm, frmMainForm);
   Application.CreateForm(TfrmTADCals, frmTADCals);
   Application.CreateForm(TfrmHistory, frmHistory);

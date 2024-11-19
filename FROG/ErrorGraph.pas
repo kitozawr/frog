@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  TeEngine, Series, ExtCtrls, TeeProcs, Chart, FrogObj;
+  TeEngine, Series, ExtCtrls, TeeProcs, Chart, FrogObj, VclTee.TeeGDIPlus;
 
 type
   TMarkEntry = class(TFrogObject)

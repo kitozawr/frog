@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, TeeProcs, TeEngine, Chart, TadGrapher, TeeShape, Series, Func1D,
-  StdCtrls, Menus;
+  StdCtrls, Menus, VclTee.TeeGDIPlus;
 
 type
   TfrmFFTGraph = class(TForm)

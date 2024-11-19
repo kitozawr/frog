@@ -1,13 +1,10 @@
 unit CalsForm;
-
 interface
-
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, ComCtrls, FileCtrl, Grids, RunTypeU,
   AlgoCals, FrogAlgo, ReadIn, Exper, AllCals, Data.Bind.EngExt,
   Vcl.Bind.DBEngExt, Data.Bind.Components, HTMLHelpViewer;
-
 type
   TfrmCalibrations = class(TForm)
     rdgNLO: TRadioGroup;
@@ -141,6 +138,7 @@ type
     rdgFormat: TRadioGroup;
     BindingsList1: TBindingsList;
     rdgWavelengthCentering: TRadioGroup;
+    CheckBox1: TCheckBox;
     procedure drvOutputChange(Sender: TObject);
     procedure FormCreate(Sender: TObject); virtual;
     procedure cmdOKClick(Sender: TObject);
@@ -244,17 +242,12 @@ type
     property AllCals: TAllCals read mAllCals write mAllCals;
     procedure RefreshInitialFieldTab;
   end;
-
 var
   frmCalibrations: TfrmCalibrations;
 
-
 implementation
-
 uses Func1D, Gen2, NLO, MainForm, WindowMgr, EFieldCals, OutputCals;
-
 {$R *.DFM}
-
 procedure TfrmCalibrations.FormCreate(Sender: TObject);
 begin
   Top := 100;
@@ -262,16 +255,12 @@ begin
   //Height := 514;
   //Width := 824;
   mAutoSetOutputDir := True;
-
   // Set up the Radio Boxes on the main page
   rdgNLO.ItemIndex := rdgNLO.Items.IndexOf('&PG');
   rdgGridSize.ItemIndex := rdgGridSize.Items.IndexOf('64');
   rdgDataSource.ItemIndex := 0;
-
   pgcCals.ActivePage := tbsInitialField;
-
   mAllCals := TAllCals.Create;
-
   // We need to pick up the app path, it seems like the dirOutput always starts
   //  with the app path
   if not WindowManager.DefaultFrogPathNull then
@@ -280,7 +269,6 @@ begin
     dirOutput.Directory := WindowManager.DefaultFrogPath;
     drvOutput.Drive := (WindowManager.DefaultFrogPath)[1];
   end;
-
   // Init the mAlgoCals
   // Set the defaults from AlgoCals (where they were read in from the registry)
   rdgGridSize.ItemIndex := rdgGridSize.Items.IndexOf(IntToStr(AllCals.AlgoCals.N));
@@ -290,7 +278,6 @@ begin
   rdgGridSizeClick(Self);
   rdgDataSourceClick(Self);
   rdgNLOClick(Self);
-
   RefreshInitialFieldTab;
   RefreshFirstGuessTab;
   RefreshReadInTab;
@@ -298,10 +285,8 @@ begin
   RefreshOutputTab;
   InitStratTab;
   RefreshStratTab;
-
   ActiveControl := pgcCals;
 end;
-
 procedure TfrmCalibrations.cmdOKClick(Sender: TObject);
 begin
   cmdOK.SetFocus;  // Makes sure that OnExit processing for text fields is done
@@ -309,27 +294,22 @@ begin
   ModalResult := mrOk;
   //Close;
 end;
-
 procedure TfrmCalibrations.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   Action := caHide;
 end;
-
 procedure TfrmCalibrations.FormDestroy(Sender: TObject);
 begin
   mAllCals.Free;
   mAllCals := nil;
 end;
-
 procedure TfrmCalibrations.rdgGridSizeClick(Sender: TObject);
 begin
   AllCals.AlgoCals.N := StrToInt(rdgGridSize.Items[rdgGridSize.ItemIndex]);
-
   mAllCals.InitialFieldCals.N := AllCals.AlgoCals.N;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.rdgDataSourceClick(Sender: TObject);
 begin
   case rdgDataSource.ItemIndex of
@@ -366,7 +346,6 @@ begin
       end;
   end;
 end;
-
 procedure TfrmCalibrations.rdgNLOClick(Sender: TObject);
 begin
   if mAllCals = nil then Exit;
@@ -378,7 +357,6 @@ begin
   end;
   RefreshMargTab;
 end;
-
 procedure TfrmCalibrations.FormShow(Sender: TObject);
 begin
   case rdgDataSource.ItemIndex of
@@ -398,12 +376,9 @@ begin
   RefreshOutputTab; // saving dir might be changed at save time in AlgoMgr.
 end;
 
-
 // *************** Initial Field tab *********************
-
 procedure TfrmCalibrations.RdbUnitsClick(Sender: TObject);
 begin
-
   case rdbUnits.ItemIndex of
     Ord(unPixel):
     begin
@@ -420,7 +395,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.RdbDomainClick(Sender: TObject);
 begin
   case rdbDomain.ItemIndex of
@@ -435,17 +409,13 @@ begin
         //EnableFreqDomain;
       end;
   end;
-
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EnableTimeDomain;
 begin
   //RefreshInitialFieldTab;
-
   EdtFreqWidth.Text := '';
   EdtFLinC.Text := '';
-
   { Disable appropiate controls }
   CbxFreqShape.Enabled := False;
   LblFreqShape.Enabled := False;
@@ -461,7 +431,6 @@ begin
   	LblDelF.Enabled := False;
     EdtDelF.Enabled := False;
   end;
-
   // Enable appropriate controls
   CbxTempShape.Enabled := True;
   LblTempShape.Enabled := True;
@@ -478,14 +447,11 @@ begin
     EdtDelTT.Enabled := True;
   end;
 end;
-
 procedure TfrmCalibrations.EnableFreqDomain;
 begin
 	//RefreshInitialFieldTab;
-
   EdtTempWidth.Text := '';
   EdtTChirp.Text := '';
-
 	// Enable freq domain Controls}
   CbxFreqShape.Enabled := True;
   LblFreqShape.Enabled := True;
@@ -501,7 +467,6 @@ begin
   	LblDelF.Enabled := True;
     EdtDelF.Enabled := True;
   end;
-
   // Disable time domain
   CbxTempShape.Enabled := False;
   LblTempShape.Enabled := False;
@@ -518,15 +483,12 @@ begin
     EdtDelTT.Enabled := False;
   end;
 end;
-
 procedure TfrmCalibrations.EnablePixelUnits;
 begin
 //  RefreshInitialFieldTab;
-
   EdtDelTT.Text := '';
   EdtDelF.Text := '';
   EdtLam0.Text := '';
-
   // Disable appropriate controls
   LblDelT.Enabled := False;
   EdtDelTT.Enabled := False;
@@ -534,7 +496,6 @@ begin
   EdtDelF.Enabled := False;
   LblLam0.Enabled := False;
   EdtLam0.Enabled := False;
-
   // Change labels
   LblTWidthU.Caption := 'Pixels';
   LblTChirpU.Caption := '1/Pix^2';
@@ -543,12 +504,10 @@ begin
   LblFChirpU.Caption := '1/Pix^2';
   LblSCPU.Caption := '1/Pix^3';
   LblSQPU.Caption := '1/Pix^4';
-
   // First Guess Tab
   lblWidthUnits.Caption := 'pix';
   lblChirpUnits.Caption := 'pix^-2';
 end;
-
 procedure TfrmCalibrations.EnableRealUnits;
 begin
   // Enable appropiate controls
@@ -557,16 +516,13 @@ begin
   	LblDelT.Enabled := True;
   	EdtDelTT.Enabled := True;
   end;
-
   if mAllCals.InitialFieldCals.Domain = dtFreq then
   begin
   	LblDelF.Enabled := True;
   	EdtDelF.Enabled := True;
   end;
-
   LblLam0.Enabled := True;
   EdtLam0.Enabled := True;
-
   // Change labels
   LblTWidthU.Caption := 'fs';
   LblTChirpU.Caption := '1/fs^2';
@@ -575,14 +531,12 @@ begin
   LblFChirpU.Caption := 'fs^2';
   LblSCPU.Caption := 'fs^3';
   LblSQPU.Caption := 'fs^4';
-
   // First Guess Form
   if mAllCals.InitialFieldCals.Domain = dtTime then lblWidthUnits.Caption := 'fs'
   else if mAllCals.InitialFieldCals.Domain = dtFreq then lblWidthUnits.Caption := 'nm';
   if mAllCals.InitialFieldCals.Domain = dtTime then lblChirpUnits.Caption := 'fs^-2'
   else if mAllCals.InitialFieldCals.Domain = dtFreq then lblChirpUnits.Caption := 'fs^2';
 end;
-
 procedure TfrmCalibrations.RefreshInitialFieldTab;
 begin
   // Temporal side
@@ -592,7 +546,6 @@ begin
   EdtTCP.Text := FloatToStrF(mAllCals.InitialFieldCals.TCP, ffGeneral, 4, 0);
   if mAllCals.InitialFieldCals.Units = unReal then
     EdtDelTT.Text := FloatToStrF(mAllCals.InitialFieldCals.DelT, ffGeneral, 4, 0);
-
   // Frequency side
   EdtFreqWidth.Text := FloatToStrF(mAllCals.InitialFieldCals.SpecWidth, ffGeneral, 4, 0);
   EdtFLinC.Text := FloatToStrF(mAllCals.InitialFieldCals.SpecChirp, ffGeneral, 4, 0);
@@ -600,22 +553,18 @@ begin
   EdtSQP.Text := FloatToStrF(mAllCals.InitialFieldCals.SQP, ffGeneral, 4, 0);
   if mAllCals.InitialFieldCals.Units = unReal then
     EdtDelF.Text := FloatToStrF(mAllCals.InitialFieldCals.DelLam, ffGeneral, 4, 0);
-
   if mAllCals.InitialFieldCals.Units = unReal then
     EdtLam0.Text := FloatToStrF(mAllCals.InitialFieldCals.Lam0, ffGeneral, 4, 0);
-
   // The domain
   if mAllCals.InitialFieldCals.Domain = dtTime then
     EnableTimeDomain
   else if mAllCals.InitialFieldCals.Domain = dtFreq then
     EnableFreqDomain;
-
   // Units
   if mAllCals.InitialFieldCals.Units = unReal then
     EnableRealUnits
   else if mAllCals.InitialFieldCals.Units = unPixel then
     EnablePixelUnits;
-
   // Keep the FirstGuess in synch
   mAllCals.FirstGuessCals.Domain := mAllCals.InitialFieldCals.Domain;
   mAllCals.FirstGuessCals.Units := mAllCals.InitialFieldCals.Units;
@@ -624,10 +573,8 @@ begin
   mAllCals.FirstGuessCals.DelT := mAllCals.InitialFieldCals.DelT;
     // Important: set Lam0 first, if you set Delt, the cals object changes the delLam
     // based on the old lam0, and screws it up if you are in the freq domain.
-
   if AllCals.AlgoCals.RunTypeEnum = rteTheory then cmdOk.Enabled := True;
 end;
-
 procedure TfrmCalibrations.EdtTempWidthExit(Sender: TObject);
 begin
   try
@@ -636,7 +583,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtTChirpExit(Sender: TObject);
 begin
   try
@@ -645,7 +591,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtSPMExit(Sender: TObject);
 begin
   try
@@ -654,7 +599,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtTCPExit(Sender: TObject);
 begin
   try
@@ -663,7 +607,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.edtDelTTExit(Sender: TObject);
 begin
   try
@@ -672,7 +615,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtFreqWidthExit(Sender: TObject);
 begin
   try
@@ -681,7 +623,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtFLinCExit(Sender: TObject);
 begin
   try
@@ -690,7 +631,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtSCPExit(Sender: TObject);
 begin
   try
@@ -699,7 +639,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtSQPExit(Sender: TObject);
 begin
   try
@@ -708,7 +647,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtDelFExit(Sender: TObject);
 begin
   try
@@ -717,7 +655,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.EdtLam0Exit(Sender: TObject);
 begin
   try
@@ -726,7 +663,6 @@ begin
   end;
   RefreshInitialFieldTab;
 end;
-
 procedure TfrmCalibrations.CbxTempShapeChange(Sender: TObject);
 begin
   case CbxTempShape.ItemIndex of
@@ -735,7 +671,6 @@ begin
     Ord(fsSuperGaussian): mAllCals.InitialFieldCals.TempShape := fsSuperGaussian;
   end;
 end;
-
 procedure TfrmCalibrations.CbxFreqShapeChange(Sender: TObject);
 begin
   case CbxFreqShape.ItemIndex of
@@ -744,7 +679,6 @@ begin
     Ord(fsSuperGaussian): mAllCals.InitialFieldCals.SpecShape := fsSuperGaussian;
   end;
 end;
-
 procedure TfrmCalibrations.BtnTimeDoubleClick(Sender: TObject);
 begin
   frmGen2 := TFrmGen2.Create(Application);
@@ -756,13 +690,11 @@ begin
   end;
 end;
 
-
 // ******************* Outputs Tab ***********************
 procedure TfrmCalibrations.drvOutputChange(Sender: TObject);
 begin
   dirOutput.Drive := drvOutput.Drive;
 end;
-
 procedure TfrmCalibrations.dirOutputChange(Sender: TObject);
 begin
   AllCals.OutputCals.FilePath := dirOutput.Directory;
@@ -770,7 +702,6 @@ begin
   //  outputs tab, not from the other tabs
   if(pgcCals.ActivePage = tbsOutputs) then mAutoSetOutputDir := False;
 end;
-
 procedure TfrmCalibrations.RefreshOutputTab;
 begin
   edtPhaseBlank.Text := FloatToStrF(AllCals.OutputCals.PhaseBlank, ffGeneral, 2, 0);
@@ -780,7 +711,6 @@ begin
   chkOverwrite.Checked := AllCals.OutputCals.Overwrite;
   rdgFormat.ItemIndex := Ord(AllCals.OutputCals.OutputFormat);
 end;
-
 procedure TfrmCalibrations.edtPhaseBlankExit(Sender: TObject);
 begin
   try
@@ -789,17 +719,14 @@ begin
   end;
   RefreshOutputTab;
 end;
-
 procedure TfrmCalibrations.chkGraphicsClick(Sender: TObject);
 begin
   AllCals.OutputCals.DisplayGraphics := chkGraphics.Checked;
 end;
-
 procedure TfrmCalibrations.chkOverwriteClick(Sender: TObject);
 begin
 	AllCals.OutputCals.Overwrite := chkOverwrite.Checked;
 end;
-
 procedure TfrmCalibrations.rdgFormatClick(Sender: TObject);
 begin
  // this sucks, but how else do you get from int to enum?
@@ -809,7 +736,6 @@ begin
      AllCals.OutputCals.OutputFormat := ofFemtosoft;
  AllCals.OutputCals.SaveFormat;
 end;
-
 // ******************* First Guess Tab ***********************
 procedure TfrmCalibrations.rdgInitialFieldClick(Sender: TObject);
 begin
@@ -819,7 +745,6 @@ begin
     Ord(eiIntensityNoise): mAllCals.FirstGuessCals.InitType := eiIntensityNoise;
     Ord(eiCustom): mAllCals.FirstGuessCals.InitType := eiCustom;
   end;
-
   if mAllCals.FirstGuessCals.InitType = eiCustom then
   begin
     lblWidth.Enabled := True;
@@ -853,9 +778,7 @@ begin
     edtFSPM.Text := '';
     lblFSPMUnits.Enabled := False;
   end;
-
 end;
-
 procedure TfrmCalibrations.RefreshFirstGuessTab;
 begin
   rdgInitialFieldClick(Self);
@@ -871,7 +794,6 @@ begin
     edtChirp.Text := FloatToStrF(mAllCals.FirstGuessCals.SpecChirp, ffGeneral, 4, 0);
   end;
 end;
-
 procedure TfrmCalibrations.edtWidthExit(Sender: TObject);
 begin
   try
@@ -883,7 +805,6 @@ begin
   end;
   RefreshFirstGuessTab;
 end;
-
 procedure TfrmCalibrations.edtChirpExit(Sender: TObject);
 begin
   try
@@ -895,7 +816,6 @@ begin
   end;
   RefreshFirstGuessTab;
 end;
-
 procedure TfrmCalibrations.edtFSPMExit(Sender: TObject);
 begin
   try
@@ -905,10 +825,8 @@ begin
   end;
   RefreshFirstGuessTab;
 end;
-
 // ******************* Input Data Tab ***********************
 //  for ReadIn  - crummy name
-
 procedure TfrmCalibrations.RefreshReadInTab;
 begin
   edtReadInFilename.Text := AllCals.ReadIn.ReadInFile;
@@ -928,12 +846,10 @@ begin
     cmdOk.Enabled := False;
   chkReadInHeader.Checked := AllCals.ReadIn.UseHeader;
 end;
-
 procedure TfrmCalibrations.edtReadInFilenameExit(Sender: TObject);
 begin
   AllCals.ReadIn.ReadInFile := edtReadInFilename.Text;
 end;
-
 procedure TfrmCalibrations.cmdReadInFileClick(Sender: TObject);
 begin
   dlgOpen.Title := 'Select file containing E-field';
@@ -950,13 +866,11 @@ begin
   end;
   RefreshReadInTab;
 end;
-
 procedure TfrmCalibrations.chkReadinHeaderClick(Sender: TObject);
 begin
   AllCals.ReadIn.UseHeader := chkReadinHeader.Checked;
   RefreshReadInTab;
 end;
-
 procedure TfrmCalibrations.edtReadInLam0Exit(Sender: TObject);
 begin
   try
@@ -965,7 +879,6 @@ begin
   end;
   RefreshReadInTab;
 end;
-
 procedure TfrmCalibrations.edtReadInLam0Change(Sender: TObject);
 begin
   // This is just to add some user friendliness, I hate to duplicate the code.
@@ -978,7 +891,6 @@ begin
   except
   end;
 end;
-
 procedure TfrmCalibrations.rdgDownsizeClick(Sender: TObject);
 begin
   case rdgDownsize.ItemIndex of
@@ -988,9 +900,7 @@ begin
   RefreshReadInTab;
 end;
 
-
 // ******************* Experimental Data Tab ***********************
-
 procedure TfrmCalibrations.RefreshExperTab;
 begin
   edtExperFile.Text := AllCals.Exper.ExperFile;
@@ -1004,7 +914,6 @@ begin
   rdgBinning.ItemIndex := Ord(AllCals.Exper.Binning);
   rdgWavelengthCentering.ItemIndex := Ord(AllCals.Exper.WavelengthCentering);
   chkExperHeader.Checked := AllCals.Exper.UseHeader;
-
   // Can we allow them to click OK?
   if AllCals.Exper.ExperFile <> AllCals.Exper.NullFile then
   begin
@@ -1020,12 +929,10 @@ begin
     if AllCals.AlgoCals.RunTypeEnum = rteExperimental then cmdOk.Enabled := False;
   end;
 end;
-
 procedure TfrmCalibrations.edtExperFileExit(Sender: TObject);
 begin
   AllCals.Exper.ExperFile := edtExperFile.Text;
 end;
-
 procedure TfrmCalibrations.cmdExperDataFileClick(Sender: TObject);
 begin
   dlgOpen.Title := 'Select file with experimental FROG trace';
@@ -1042,10 +949,8 @@ begin
     // uncheck the header
     AllCals.Exper.UseHeader := False;
   end;
-
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.EdtNTauExit(Sender: TObject);
 begin
   try
@@ -1054,7 +959,6 @@ begin
   end;
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.EdtNLamExit(Sender: TObject);
 begin
   try
@@ -1063,7 +967,6 @@ begin
   end;
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.EdtDelTExit(Sender: TObject);
 begin
   try
@@ -1072,7 +975,6 @@ begin
   end;
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.EdtDelLamExit(Sender: TObject);
 begin
   try
@@ -1080,7 +982,6 @@ begin
   except on EConvertError do
   end;
 end;
-
 procedure TfrmCalibrations.EdtLamCenterExit(Sender: TObject);
 begin
   try
@@ -1090,7 +991,6 @@ begin
   end;
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.EdtLam1Exit(Sender: TObject);
 begin
   try
@@ -1101,7 +1001,6 @@ begin
   end;
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.rdgOrderClick(Sender: TObject);
 begin
   case rdgOrder.ItemIndex of
@@ -1110,7 +1009,6 @@ begin
   end;
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.rdgBinningClick(Sender: TObject);
 begin
   case rdgBinning.ItemIndex of
@@ -1119,7 +1017,6 @@ begin
   end;
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.rdgWavelengthCenteringClick(Sender: TObject);
 begin
   case rdgWavelengthCentering.ItemIndex of
@@ -1128,20 +1025,17 @@ begin
   end;
   RefreshExperTab;
 end;
-
 procedure TfrmCalibrations.chkExperHeaderClick(Sender: TObject);
 begin
   AllCals.Exper.UseHeader := chkExperHeader.Checked;
   RefreshExperTab;
 end;
-
 // ******************* Strategies Tab ***********************
 var
   NAME_COL: integer;
   SWITCH_COL: integer;
   NEW_FIELD_COL: integer;
   SPECIAL_COL: integer;
-
 procedure TfrmCalibrations.RefreshStratTab;
 var
   i, col, row: integer;
@@ -1159,7 +1053,6 @@ begin
     stgStrats.Cells[SPECIAL_COL, row] := FloatToStrF(AllCals.StrategyCals.Special[i], ffGeneral, 3, 2);
   end;
 end;
-
 procedure TfrmCalibrations.stgStratsSelectCell(Sender: TObject; Col,
   Row: Integer; var CanSelect: Boolean);
 begin
@@ -1173,16 +1066,13 @@ begin
   except on EConvertError do
   end;
   RefreshStratTab;
-
   mRow := Row;
   mCol := Col;
-
   if mCol = NAME_COL then
     stgStrats.EditorMode := False
   else
     stgStrats.EditorMode := True;
 end;
-
 procedure TfrmCalibrations.stgStratsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 var
@@ -1193,17 +1083,14 @@ begin
     cbxStrats.Visible := False;
     stgStrats.SetFocus;
   end;
-
   if Key = VK_RETURN then
     stgStratsSelectCell(Self, mCol, mRow, junk);
 end;
-
 procedure TfrmCalibrations.stgStratsMouseDown(Sender: TObject;
   Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
   if mCol = NAME_COL then ShowComboBox;
 end;
-
 procedure TfrmCalibrations.ShowComboBox;
 var
   i, colLeft, rowTop: integer;
@@ -1215,7 +1102,6 @@ begin
   rowTop := 0;
   for i := stgStrats.TopRow - 1 to mRow - 1 do
     rowTop := rowTop + stgStrats.RowHeights[i] + stgStrats.GridLineWidth;
-
   cbxStrats.Left := stgStrats.Left + colLeft + 1;
   cbxStrats.Top := stgStrats.Top + rowTop + 1;
   cbxStrats.Width := stgStrats.ColWidths[mCol];
@@ -1228,7 +1114,6 @@ begin
   cbxStrats.Visible := True;
   cbxStrats.SetFocus;
 end;
-
 // StratIndex := mRow + 1 - FixedRows
 // mRow := StratIndex - 1 + FixedRows
 procedure TfrmCalibrations.cbxStratsChange(Sender: TObject);
@@ -1238,7 +1123,6 @@ begin
   stgStrats.SetFocus;
   RefreshStratTab;
 end;
-
 procedure TfrmCalibrations.InitStratTab;
 var
   i: integer;
@@ -1247,16 +1131,13 @@ begin
   SWITCH_COL := stgStrats.FixedCols + 1;
   NEW_FIELD_COL := stgStrats.FixedCols + 2;
   SPECIAL_COL := stgStrats.FixedCols + 3;
-
   cbxStrats.Clear;
   for i := 0 to AllCals.StrategyCals.TotalNumStrategies - 1 do
   begin
     cbxStrats.Items.Add(AllCals.StrategyCals.NameOfStrategy(i));
   end;
-
   if stgStrats.FixedCols = 1 then
     stgStrats.ColWidths[0] := 30;
-
   if stgStrats.FixedRows = 1 then
   begin
     stgStrats.Cells[NAME_COL,0] := 'Strategy';
@@ -1265,7 +1146,6 @@ begin
     stgStrats.Cells[SPECIAL_COL,0] := 'Shortcut';
   end;
 end;
-
 procedure TfrmCalibrations.stgStratsSetEditText(Sender: TObject; ACol,
   ARow: Integer; const Value: String);
 begin
@@ -1280,29 +1160,24 @@ begin
   end;
   RefreshStratTab;}
 end;
-
 procedure TfrmCalibrations.cmdInsertClick(Sender: TObject);
 begin
     AllCals.StrategyCals.InsertStrategy(mRow + 1 - stgStrats.FixedRows);
     RefreshStratTab;
 end;
-
 procedure TfrmCalibrations.cmdDeleteClick(Sender: TObject);
 begin
     AllCals.StrategyCals.DeleteStrategy(mRow + 1 - stgStrats.FixedRows);
     RefreshStratTab;
 end;
-
 procedure TfrmCalibrations.cbxStratsEnter(Sender: TObject);
 begin
   cmdCancel.Cancel := false;
 end;
-
 procedure TfrmCalibrations.cbxStratsExit(Sender: TObject);
 begin
   cmdCancel.Cancel := True;
 end;
-
 procedure TfrmCalibrations.cbxStratsKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -1313,10 +1188,7 @@ begin
   end;
 end;
 
-
-
 // ******************* Marginals Tab ***********************
-
 procedure TfrmCalibrations.RefreshMargTab;
 var
   nlo: TNLOInteraction;
@@ -1325,14 +1197,12 @@ begin
   edtAutocorrelation.Text := AllCals.MargCals.AutoCals.ReadInFile;
   edtSHGSpectrum.Text := AllCals.MargCals.SHGSpecCals.ReadInFile;
   chkForceMarginal.Checked := AllCals.MargCals.ForceMarginals;
-
   nlo := AllCals.AlgoCals.NLOClass.Create;
   EnableSpectrum(nlo.NeedSpectrum);
   EnableAutocorrelation(nlo.NeedAutocorrelation);
   EnableSHGSpectrum(nlo.NeedSHGSpectrum);
   nlo.Free;
 end;
-
 procedure TfrmCalibrations.EnableSpectrum(pEnable: boolean);
 begin
        lblSpectrum.Enabled := pEnable;
@@ -1354,7 +1224,6 @@ begin
        cmdSHGSpectrum.Enabled := pEnable;
        cmdClearSHGSpec.Enabled := pEnable;
 end;
-
 procedure TfrmCalibrations.cmdSpectrumClick(Sender: TObject);
 begin
   dlgOpen.Title := 'Select file with experimental spectrum';
@@ -1365,7 +1234,6 @@ begin
   end;
   RefreshMargTab;
 end;
-
 procedure TfrmCalibrations.cmdAutocorrelationClick(Sender: TObject);
 begin
   dlgOpen.Title := 'Select file with experimental autocorrelation';
@@ -1376,7 +1244,6 @@ begin
   end;
   RefreshMargTab;
 end;
-
 procedure TfrmCalibrations.cmdSHGSpectrumClick(Sender: TObject);
 begin
   dlgOpen.Title := 'Select file with experimental SHG spectrum';
@@ -1387,43 +1254,34 @@ begin
   end;
   RefreshMargTab;
 end;
-
 procedure TfrmCalibrations.cmdClearSpecClick(Sender: TObject);
 begin
   AllCals.MargCals.SpecCals.ReadInFile := AllCals.MargCals.SpecCals.NullFile;
   RefreshMargTab;
 end;
-
 procedure TfrmCalibrations.cmdClearAutoClick(Sender: TObject);
 begin
   AllCals.MargCals.AutoCals.ReadInFile := AllCals.MargCals.AutoCals.NullFile;
   RefreshMargTab;
 end;
-
 procedure TfrmCalibrations.cmdClearSHGSpecClick(Sender: TObject);
 begin
   AllCals.MargCals.SHGSpecCals.ReadInFile := AllCals.MargCals.SHGSpecCals.NullFile;
   RefreshMargTab;
 end;
-
 procedure TfrmCalibrations.chkForceMarginalClick(Sender: TObject);
 begin
   AllCals.MargCals.ForceMarginals := chkForceMarginal.Checked;
 end;
 
 
-
-
 procedure TfrmCalibrations.cmdHelpClick(Sender: TObject);
 begin
   Application.HelpContext(pgcCals.ActivePage.HelpContext);
 end;
-
 procedure TfrmCalibrations.cmdCancelClick(Sender: TObject);
 begin
   ModalResult := mrCancel;
 end;
-
-
 
 end.

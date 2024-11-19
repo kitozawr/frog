@@ -1,14 +1,10 @@
 unit Exper;
-
 interface
-
-uses FrogObj, FrogTrace, Numerics, NLO, Classes, Windows, RawData;
-
+uses FrogObj, FrogTrace, Numerics, NLO, Classes, Windows, RawData, IOUtils;
 type
   TDataOrder = (doWavelength, doDelay);
   TBinning = (bnWavelength, bnFrequency);
   TWavelengthCentering = (wcCenterOfMass, wcPeak);
-
   TExper = class(TFrogObject)
     private
       mNTau: integer;
@@ -55,12 +51,9 @@ type
       constructor Create;
       destructor Destroy; override;
   end;
-
 implementation
 
-
 uses Dialogs, SysUtils, RawImage, Forms, WindowMgr, Controls;
-
 constructor TExper.Create;
 begin
   inherited Create;
@@ -71,18 +64,16 @@ begin
   mLam0 := 0;
   mNullFile := 'None Selected';
   mFileName := mNullFile;
-  mDataOrder := doWavelength;
+  mDataOrder := doDelay;
   mBinning := bnWavelength;
   mWavelengthCentering := wcCenterOfMass;
   mLog := TStringList.Create;
 end;
-
 destructor TExper.Destroy;
 begin
   mLog.Free;
   inherited;
 end;
-
 procedure TExper.LoadOriginalFrogTrace(pFrogI: TFrogTrace; pNLO: TNLOInteraction);
 var
   centerWavelengthByPeak: boolean;
@@ -112,17 +103,14 @@ begin
     frmRaw.Free;
   end;
 end;
-
 procedure TExper.SetLam1(pLam1: double);
 begin
   mLam0 := pLam1 + mDelLam*(mNLam div 2)
 end;
-
 function TExper.GetLam1: double;
 begin
   GetLam1 := mLam0 - mDelLam*(mNLam div 2)
 end;
-
 procedure TExper.ChangeUseHeader(pUseHeader: Boolean);
 begin
   mUseHeader := pUseHeader;
@@ -138,11 +126,32 @@ begin
     mLam0 := 0;
   end;
 end;
-
 procedure TExper.FetchHeaders;
 var
   F: TextFile;
+  fs: TFileStream;
+  Sbuf: TBytes;
+  i:integer;
 begin
+  fs := TFileStream.Create(mFileName, fmOpenread or fmShareDenyNone);
+  try
+    SetLength(Sbuf, fs.Size);
+    fs.ReadBuffer(Sbuf[1], fs.Size);
+  finally
+    fs:=nil;
+  end;
+
+  begin
+  for i := 1 to Length(Sbuf) do
+    if (Sbuf[i]=$2c) then
+      Sbuf[i]:=$2e;
+  end;
+  fs := TFileStream.Create(System.IOUtils.TPath.GetFileName(mFileName), fmOpenWrite);
+  try
+   fs.WriteBuffer(Sbuf[1], Length(Sbuf));
+  finally
+    fs:=nil;
+  end;
   AssignFile(F, mFileName);
   try
     Reset(F);
@@ -150,7 +159,6 @@ begin
     ShowMessage('Error opening file ' + ExtractFileName(mFileName));
     Exit;
   end;
-
   try
     ReadHeaders(F);
   except
@@ -158,8 +166,8 @@ begin
   end;
   CloseFile(F);
 end;
-
 procedure TExper.ReadHeaders(var pF: TextFile);
+
 begin
   Read(pF, mNtau);
   Read(pF, mNLam);
@@ -167,7 +175,6 @@ begin
   Read(pF, mDelLam);
   Read(pF, mLam0);
 end;
-
 procedure TExper.ReadDataFromFile;
 var
   F: TextFile;
@@ -183,7 +190,6 @@ begin
   except
     raise Exception.Create('Error opening file ' + ExtractFileName(mFileName));
   end;
-
   try
     // If there are headers, get rid of 'em
     if mUseHeader then
@@ -201,7 +207,6 @@ begin
       //ReadLn(F, s);
       //This doesn't work either: ReadLn(F);
     end;
-
     // Read in the data
     i := 0;
     if mDataOrder = doWavelength then
@@ -223,7 +228,6 @@ begin
           Inc(i);
         end;
     end;
-
     // Ran out at too few points
     if i < NTot then
     begin
@@ -234,7 +238,6 @@ begin
  		  MessageDlg(mssg, mtWarning, [mbOK], 0);
       // raise exception
 	  end;
-
     // Check to see that we are really at the end
  	  Read(F, junk);
 	  if not Eof(F) then
@@ -243,7 +246,6 @@ begin
     CloseFile(F);
   end;
 end;
-
 procedure TExper.InitLog(pLog: TStringList);
 begin
   with pLog do
@@ -266,10 +268,8 @@ begin
   end;
   pLog.AddStrings(mLog);
 end;
-
 function TExper.GetFileName: string;
 begin
   GetFileName := ExtractFileName(mFileName);
 end;
-
 end.
